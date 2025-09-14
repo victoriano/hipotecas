@@ -195,10 +195,32 @@ export default function MortgageBonusCalculator() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900 p-6 md:p-10">
+      {/* Toast fixed overlay */}
+      <div className="pointer-events-none fixed top-4 inset-x-0 z-50 flex justify-center">
+        {copied && (
+          <div className="pointer-events-auto inline-flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 text-green-700 px-3 py-2 shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-2.59a.75.75 0 1 0-1.06-1.06l-4.72 4.72-1.78-1.78a.75.75 0 1 0-1.06 1.06l2.31 2.31c.293.293.767.293 1.06 0l5.25-5.25Z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm">Enlace copiado al portapapeles</span>
+          </div>
+        )}
+      </div>
       <div className="max-w-6xl mx-auto space-y-6">
-        <header className="flex flex-col gap-2">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Calculadora de bonificaciones de hipoteca</h1>
-          <p className="text-sm md:text-base text-gray-600">Ajusta los datos y compara el ahorro de cada bonificación por separado y en combinación. Los cálculos usan cuota francesa y redondeo a 2 decimales.</p>
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Calculadora de bonificaciones de hipoteca</h1>
+            <p className="text-sm md:text-base text-gray-600">Ajusta los datos y compara el ahorro de cada bonificación por separado y en combinación. Los cálculos usan cuota francesa y redondeo a 2 decimales.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={shareState} className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-sm inline-flex items-center gap-2" aria-label="Compartir enlace">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M15.75 2.25a.75.75 0 0 0 0 1.5h2.69l-6.97 6.97a.75.75 0 1 0 1.06 1.06l6.97-6.97v2.69a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75h-4.5Z"/>
+                <path d="M4.5 5.25A2.25 2.25 0 0 0 2.25 7.5v10.125A2.625 2.625 0 0 0 4.875 20.25h10.125a2.25 2.25 0 0 0 2.25-2.25V12a.75.75 0 0 0-1.5 0v6a.75.75 0 0 1-.75.75H4.875A1.125 1.125 0 0 1 3.75 17.625V7.5a.75.75 0 0 1 .75-.75h6a.75.75 0 0 0 0-1.5h-6Z"/>
+              </svg>
+              <span>Compartir</span>
+            </button>
+          </div>
         </header>
 
         {/* Panel de parámetros del préstamo */}
@@ -213,7 +235,6 @@ export default function MortgageBonusCalculator() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Bonificaciones</h2>
               <div className="flex gap-2">
-                <button onClick={shareState} className="px-3 py-1.5 rounded-xl bg-gray-200 text-sm">Compartir</button>
                 <button onClick={addCustomBonus} className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-sm">Añadir</button>
                 <button onClick={resetDefaults} className="px-3 py-1.5 rounded-xl bg-gray-200 text-sm">Restablecer</button>
               </div>
@@ -224,11 +245,6 @@ export default function MortgageBonusCalculator() {
               <div className="mb-3 text-sm flex items-center gap-3 p-2 rounded-xl bg-yellow-50 border border-yellow-200">
                 <span>Has borrado "{lastRemoved.name}".</span>
                 <button type="button" onClick={undoRemove} className="px-2 py-1 rounded-lg bg-yellow-600 text-white text-xs">Deshacer</button>
-              </div>
-            )}
-            {copied && (
-              <div className="mb-3 text-sm flex items-center gap-3 p-2 rounded-xl bg-green-50 border border-green-200 text-green-700">
-                <span>Enlace copiado al portapapeles</span>
               </div>
             )}
 

@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist",
+  "build": {
+    "env": {
+      "BUN_VERSION": "1.2.8"
+    }
+  }
+}
+
+
