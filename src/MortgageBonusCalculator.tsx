@@ -19,7 +19,6 @@ export default function MortgageBonusCalculator() {
   const [capital, setCapital] = useState(270000);
   const [years, setYears] = useState(30);
   const [baseRatePct, setBaseRatePct] = useState(2.7); // % anual
-  const [maxComboDiscountPct, setMaxComboDiscountPct] = useState(0.85); // % máximo bonificable total
 
   // Bonificaciones por defecto según tu email
   const [bonuses, setBonuses] = useState<Bonus[]>([
@@ -77,7 +76,7 @@ export default function MortgageBonusCalculator() {
   const combo = useMemo(() => {
     const enabled = bonuses.filter(b => b.enabled);
     const sumDiscount = enabled.reduce((acc, b) => acc + b.discountPct, 0);
-    const appliedDiscount = Math.min(sumDiscount, maxComboDiscountPct);
+    const appliedDiscount = sumDiscount;
     const comboRate = baseRatePct - appliedDiscount;
     const comboPayment = paymentMonthly(capital, comboRate, nMonths);
     const monthlySaving = basePayment - comboPayment;
@@ -86,7 +85,7 @@ export default function MortgageBonusCalculator() {
     const netAnnual = annualSaving - annualCost;
     const net30y = monthlySaving * nMonths - annualCost * years;
     return { appliedDiscount, comboRate, comboPayment, monthlySaving, annualSaving, annualCost, netAnnual, net30y, enabledCount: enabled.length };
-  }, [bonuses, basePayment, baseRatePct, capital, maxComboDiscountPct, nMonths, years]);
+  }, [bonuses, basePayment, baseRatePct, capital, nMonths, years]);
 
   function updateBonus(id: string, patch: Partial<Bonus>) {
     setBonuses(prev => prev.map(b => b.id === id ? { ...b, ...patch } : b));
@@ -123,7 +122,6 @@ export default function MortgageBonusCalculator() {
     setCapital(270000);
     setYears(30);
     setBaseRatePct(2.7);
-    setMaxComboDiscountPct(0.85);
     setBonuses([
       { id: "nomina", name: "Domiciliación de nómina", discountPct: 0.35, annualCost: 0, enabled: true },
       { id: "hogar", name: "Seguro de hogar", discountPct: 0.15, annualCost: 660, enabled: true },
@@ -162,11 +160,10 @@ export default function MortgageBonusCalculator() {
         </header>
 
         {/* Panel de parámetros del préstamo */}
-        <section className="grid md:grid-cols-4 gap-4">
+        <section className="grid md:grid-cols-3 gap-4">
           <Card title="Capital" subtitle="€" value={capital} onChange={(v)=> setCapital(parseNum(v))} step="1000" />
           <Card title="Plazo" subtitle="años" value={years} onChange={(v)=> setYears(Math.max(1, Math.round(parseNum(v))))} step="1" />
           <Card title="Tipo base" subtitle="% TIN" value={baseRatePct} onChange={(v)=> setBaseRatePct(parseNum(v))} step="0.01" />
-          <Card title="Tope descuento combo" subtitle="%" value={maxComboDiscountPct} onChange={(v)=> setMaxComboDiscountPct(parseNum(v))} step="0.01" />
         </section>
 
         <section className="grid md:grid-cols-3 gap-4">
@@ -252,7 +249,7 @@ export default function MortgageBonusCalculator() {
             <h3 className="font-semibold mb-2">Combinación seleccionada</h3>
             <ul className="text-sm space-y-1">
               <li><span className="text-gray-600">Bonos activos</span>: {combo.enabledCount}</li>
-              <li><span className="text-gray-600">Descuento aplicado</span>: {pct(combo.appliedDiscount)} <span className="text-gray-500">(tope {pct(maxComboDiscountPct)})</span></li>
+              <li><span className="text-gray-600">Descuento aplicado</span>: {pct(combo.appliedDiscount)}</li>
               <li><span className="text-gray-600">Tipo resultante</span>: {pct(combo.comboRate)}</li>
               <li><span className="text-gray-600">Nueva cuota</span>: <span className="font-medium">{eur(combo.comboPayment)}</span></li>
               <li className={combo.monthlySaving >= 0 ? "text-green-700" : "text-red-700"}><span className="text-gray-600">Ahorro mensual</span>: {eur(combo.monthlySaving)}</li>
@@ -261,7 +258,7 @@ export default function MortgageBonusCalculator() {
               <li className={combo.netAnnual >= 0 ? "text-green-700" : "text-red-700"}><span className="text-gray-600">Ahorro neto anual</span>: <span className="font-semibold">{eur(combo.netAnnual)}</span></li>
               <li className={combo.net30y >= 0 ? "text-green-700" : "text-red-700"}><span className="text-gray-600">Ahorro neto 30 años</span>: <span className="font-semibold">{eur(combo.net30y)}</span></li>
             </ul>
-            <p className="text-xs text-gray-500 mt-3">Activa o desactiva bonificaciones en la tabla para ver el efecto combinado. El descuento total está limitado por el tope configurado.</p>
+            <p className="text-xs text-gray-500 mt-3">Activa o desactiva bonificaciones en la tabla para ver el efecto combinado. El descuento total es la suma de las bonificaciones activas.</p>
           </div>
         </section>
 
