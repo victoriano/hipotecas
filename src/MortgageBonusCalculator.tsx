@@ -19,6 +19,7 @@ export default function MortgageBonusCalculator() {
   const [capital, setCapital] = useState(270000);
   const [years, setYears] = useState(30);
   const [baseRatePct, setBaseRatePct] = useState(2.7); // % anual
+  const [bankName, setBankName] = useState("Banco Genérico");
 
   // Bonificaciones por defecto
   const [bonuses, setBonuses] = useState<Bonus[]>([
@@ -96,12 +97,13 @@ export default function MortgageBonusCalculator() {
       const bin = atob(s);
       const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
       const json = new TextDecoder().decode(bytes);
-      const parsed = JSON.parse(json) as { capital: number; years: number; baseRatePct: number; bonuses: Bonus[] };
+      const parsed = JSON.parse(json) as { capital: number; years: number; baseRatePct: number; bonuses: Bonus[]; bankName?: string };
       if (parsed && typeof parsed === "object") {
         if (typeof parsed.capital === "number") setCapital(parsed.capital);
         if (typeof parsed.years === "number") setYears(parsed.years);
         if (typeof parsed.baseRatePct === "number") setBaseRatePct(parsed.baseRatePct);
         if (Array.isArray(parsed.bonuses)) setBonuses(parsed.bonuses);
+        if (typeof parsed.bankName === "string") setBankName(parsed.bankName);
       }
     } catch {
       // Ignorar errores de parseo
@@ -109,7 +111,7 @@ export default function MortgageBonusCalculator() {
   }, []);
 
   function buildShareUrl(): string {
-    const payload = { capital, years, baseRatePct, bonuses };
+    const payload = { capital, years, baseRatePct, bonuses, bankName };
     const json = JSON.stringify(payload);
     const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(json)));
     const url = new URL(window.location.href);
@@ -163,6 +165,7 @@ export default function MortgageBonusCalculator() {
     setCapital(270000);
     setYears(30);
     setBaseRatePct(2.7);
+    setBankName("Banco Genérico");
     setBonuses([
       { id: "nomina", name: "Domiciliación de nómina", discountPct: 0.35, annualCost: 0, enabled: true },
       { id: "hogar", name: "Seguro de hogar", discountPct: 0.15, annualCost: 660, enabled: true },
@@ -205,12 +208,28 @@ export default function MortgageBonusCalculator() {
         )}
       </div>
       <div className="max-w-6xl mx-auto space-y-6">
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div className="flex flex-col gap-2">
+        <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div className="flex flex-col gap-1">
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Calculadora de bonificaciones de hipoteca</h1>
             <p className="text-sm md:text-base text-gray-600">Ajusta los datos y compara el ahorro de cada bonificación por separado y en combinación. Los cálculos usan cuota francesa y redondeo a 2 decimales.</p>
+            {/* Botón mobile (arriba del input) */}
+            <div className="md:hidden mt-3">
+              <button onClick={shareState} className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-sm inline-flex items-center gap-2" aria-label="Compartir enlace">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M15.75 2.25a.75.75 0 0 0 0 1.5h2.69l-6.97 6.97a.75.75 0 1 0 1.06 1.06l6.97-6.97v2.69a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75h-4.5Z"/>
+                  <path d="M4.5 5.25A2.25 2.25 0 0 0 2.25 7.5v10.125A2.625 2.625 0 0 0 4.875 20.25h10.125a2.25 2.25 0 0 0 2.25-2.25V12a.75.75 0 0 0-1.5 0v6a.75.75 0 0 1-.75.75H4.875A1.125 1.125 0 0 1 3.75 17.625V7.5a.75.75 0 0 1 .75-.75h6a.75.75 0 0 0 0-1.5h-6Z"/>
+                </svg>
+                <span>Compartir</span>
+              </button>
+            </div>
+            <input
+              className="mt-3 md:mt-4 text-xl md:text-2xl font-semibold bg-transparent outline-none border-b border-gray-200 focus:border-gray-400 w-full max-w-md"
+              value={bankName}
+              onChange={(e)=> setBankName(e.target.value)}
+              aria-label="Nombre del banco"
+            />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
             <button onClick={shareState} className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-sm inline-flex items-center gap-2" aria-label="Compartir enlace">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                 <path d="M15.75 2.25a.75.75 0 0 0 0 1.5h2.69l-6.97 6.97a.75.75 0 1 0 1.06 1.06l6.97-6.97v2.69a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75h-4.5Z"/>
