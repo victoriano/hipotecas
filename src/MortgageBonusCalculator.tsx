@@ -273,6 +273,10 @@ export default function MortgageBonusCalculator() {
 }
 
 function Card({ title, subtitle, value, onChange, step }: { title: string; subtitle?: string; value: number; onChange: (v: string) => void; step?: string; }) {
+  const [text, setText] = useState(String(value));
+  useEffect(() => {
+    setText(String(value));
+  }, [value]);
   return (
     <div className="bg-white rounded-2xl shadow p-4 md:p-6">
       <div className="text-sm text-gray-600">{title}</div>
@@ -282,8 +286,10 @@ function Card({ title, subtitle, value, onChange, step }: { title: string; subti
           type="text"
           inputMode="decimal"
           step={step || "0.01"}
-          value={String(value)}
-          onChange={(e) => onChange(e.target.value)}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onBlur={() => onChange(text)}
+          onKeyDown={(e) => { if (e.key === "Enter") (e.currentTarget as HTMLInputElement).blur(); }}
         />
         {subtitle && <span className="text-gray-500 text-sm mb-1">{subtitle}</span>}
       </div>
@@ -292,6 +298,10 @@ function Card({ title, subtitle, value, onChange, step }: { title: string; subti
 }
 
 function NumberInput({ value, onChange, prefix, suffix, step }: { value: number; onChange: (v: string) => void; prefix?: string; suffix?: string; step?: string; }) {
+  const [text, setText] = useState(String(value));
+  useEffect(() => {
+    setText(String(value));
+  }, [value]);
   return (
     <div className="inline-flex items-center gap-1 bg-gray-100 rounded-lg px-2 py-1">
       {prefix && <span className="text-gray-500 text-xs">{prefix}</span>}
@@ -300,8 +310,10 @@ function NumberInput({ value, onChange, prefix, suffix, step }: { value: number;
         type="text"
         inputMode="decimal"
         step={step || "0.01"}
-        value={String(value)}
-        onChange={(e) => onChange(e.target.value)}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onBlur={() => onChange(text)}
+        onKeyDown={(e) => { if (e.key === "Enter") (e.currentTarget as HTMLInputElement).blur(); }}
       />
       {suffix && <span className="text-gray-500 text-xs">{suffix}</span>}
     </div>
