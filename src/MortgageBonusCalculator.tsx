@@ -20,15 +20,14 @@ export default function MortgageBonusCalculator() {
   const [years, setYears] = useState(30);
   const [baseRatePct, setBaseRatePct] = useState(2.7); // % anual
 
-  // Bonificaciones por defecto según tu email
+  // Bonificaciones por defecto
   const [bonuses, setBonuses] = useState<Bonus[]>([
     { id: "nomina", name: "Domiciliación de nómina", discountPct: 0.35, annualCost: 0, enabled: true },
     { id: "hogar", name: "Seguro de hogar", discountPct: 0.15, annualCost: 660, enabled: true },
-    { id: "vida50", name: "Seguro de vida 50% del capital (1 persona)", discountPct: 0.20, annualCost: 338.28, enabled: true },
-    { id: "vida100_1", name: "Seguro de vida 100% del capital (1 persona)", discountPct: 0.35, annualCost: 676.35, enabled: false },
-    { id: "vida100_total", name: "Seguro de vida 100% total 50% + 50% (2 personas)", discountPct: 0.35, annualCost: 338.28 + 362.64, enabled: false },
-    { id: "salud", name: "Seguro de salud", discountPct: 0.20, annualCost: 0, enabled: true },
-    { id: "alarma", name: "Alarma Securitas Direct", discountPct: 0.15, annualCost: 52.03 * 12, enabled: true },
+    { id: "vida_combo_150", name: "Seguro de vida 150K para ambos", discountPct: 0.20, annualCost: 700.92, enabled: true },
+    { id: "vida_combo_300", name: "Seguro de vida 300K para ambos", discountPct: 0.35, annualCost: 1401.15, enabled: false },
+    { id: "salud", name: "Seguro de salud", discountPct: 0.20, annualCost: 600, enabled: false },
+    { id: "alarma", name: "Alarma Securitas Direct", discountPct: 0.15, annualCost: 52.03 * 12, enabled: false },
   ]);
 
   // Estado para deshacer borrado
@@ -167,11 +166,10 @@ export default function MortgageBonusCalculator() {
     setBonuses([
       { id: "nomina", name: "Domiciliación de nómina", discountPct: 0.35, annualCost: 0, enabled: true },
       { id: "hogar", name: "Seguro de hogar", discountPct: 0.15, annualCost: 660, enabled: true },
-      { id: "vida50", name: "Seguro de vida 50% del capital (1 persona)", discountPct: 0.20, annualCost: 338.28, enabled: true },
-      { id: "vida100_1", name: "Seguro de vida 100% del capital (1 persona)", discountPct: 0.35, annualCost: 676.35, enabled: false },
-      { id: "vida100_total", name: "Seguro de vida 100% total 50% + 50% (2 personas)", discountPct: 0.35, annualCost: 700.92, enabled: false },
-      { id: "salud", name: "Seguro de salud", discountPct: 0.20, annualCost: 0, enabled: true },
-      { id: "alarma", name: "Alarma Securitas Direct", discountPct: 0.15, annualCost: 624.36, enabled: true },
+      { id: "vida_combo_150", name: "Seguro de vida 150K ambos", discountPct: 0.20, annualCost: 700.92, enabled: true },
+      { id: "vida_combo_300", name: "Seguro de vida 300K ambos", discountPct: 0.20, annualCost: 1401.15, enabled: false },
+      { id: "salud", name: "Seguro de salud", discountPct: 0.20, annualCost: 600, enabled: false },
+      { id: "alarma", name: "Alarma Securitas Direct", discountPct: 0.15, annualCost: 624.36, enabled: false },
     ]);
   }
 
