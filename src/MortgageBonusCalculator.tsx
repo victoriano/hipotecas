@@ -33,6 +33,7 @@ export default function MortgageBonusCalculator() {
 
   // Estado para deshacer borrado
   const [lastRemoved, setLastRemoved] = useState<Bonus | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const nMonths = years * 12;
 
@@ -86,6 +87,47 @@ export default function MortgageBonusCalculator() {
     const net30y = monthlySaving * nMonths - annualCost * years;
     return { appliedDiscount, comboRate, comboPayment, monthlySaving, annualSaving, annualCost, netAnnual, net30y, enabledCount: enabled.length };
   }, [bonuses, basePayment, baseRatePct, capital, nMonths, years]);
+
+  // Cargar estado compartido desde la URL (parámetro "s") si existe
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const s = sp.get("s");
+      if (!s) return;
+      const bin = atob(s);
+      const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+      const json = new TextDecoder().decode(bytes);
+      const parsed = JSON.parse(json) as { capital: number; years: number; baseRatePct: number; bonuses: Bonus[] };
+      if (parsed && typeof parsed === "object") {
+        if (typeof parsed.capital === "number") setCapital(parsed.capital);
+        if (typeof parsed.years === "number") setYears(parsed.years);
+        if (typeof parsed.baseRatePct === "number") setBaseRatePct(parsed.baseRatePct);
+        if (Array.isArray(parsed.bonuses)) setBonuses(parsed.bonuses);
+      }
+    } catch {
+      // Ignorar errores de parseo
+    }
+  }, []);
+
+  function buildShareUrl(): string {
+    const payload = { capital, years, baseRatePct, bonuses };
+    const json = JSON.stringify(payload);
+    const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(json)));
+    const url = new URL(window.location.href);
+    url.searchParams.set("s", b64);
+    return url.toString();
+  }
+
+  async function shareState() {
+    const link = buildShareUrl();
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      window.prompt("Copia este enlace", link);
+    }
+  }
 
   function updateBonus(id: string, patch: Partial<Bonus>) {
     setBonuses(prev => prev.map(b => b.id === id ? { ...b, ...patch } : b));
@@ -171,6 +213,7 @@ export default function MortgageBonusCalculator() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Bonificaciones</h2>
               <div className="flex gap-2">
+                <button onClick={shareState} className="px-3 py-1.5 rounded-xl bg-gray-200 text-sm">Compartir</button>
                 <button onClick={addCustomBonus} className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-sm">Añadir</button>
                 <button onClick={resetDefaults} className="px-3 py-1.5 rounded-xl bg-gray-200 text-sm">Restablecer</button>
               </div>
@@ -181,6 +224,11 @@ export default function MortgageBonusCalculator() {
               <div className="mb-3 text-sm flex items-center gap-3 p-2 rounded-xl bg-yellow-50 border border-yellow-200">
                 <span>Has borrado "{lastRemoved.name}".</span>
                 <button type="button" onClick={undoRemove} className="px-2 py-1 rounded-lg bg-yellow-600 text-white text-xs">Deshacer</button>
+              </div>
+            )}
+            {copied && (
+              <div className="mb-3 text-sm flex items-center gap-3 p-2 rounded-xl bg-green-50 border border-green-200 text-green-700">
+                <span>Enlace copiado al portapapeles</span>
               </div>
             )}
 
